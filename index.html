@@ -55,20 +55,15 @@ animation:float 6s linear infinite;
 @keyframes float{
 100%{transform:translateY(-120vh);}
 }
-
 </style>
 </head>
 
 <body>
 
 <div class="card">
-
 <h2 id="text">Loading...</h2>
-
 <div id="buttons"></div>
-
 <div id="timer"></div>
-
 </div>
 
 <script>
@@ -81,7 +76,7 @@ const text=document.getElementById("text");
 const buttons=document.getElementById("buttons");
 const timer=document.getElementById("timer");
 
-/* Floating hearts */
+/* Floating hearts animation */
 setInterval(()=>{
 let h=document.createElement("div");
 h.className="heart";
@@ -113,37 +108,40 @@ for(let d=7; d<=14; d++){
   targets[d] = new Date(`${currentYear}-02-${d.toString().padStart(2,'0')}T00:00:00`);
 }
 
-/* ================= PRE-LOCK PAGE ================= */
-const today = new Date();
-let day = today.getDate();
-let month = today.getMonth()+1;
+/* ================== FIRST SURPRISE PAGE ================== */
+let dayPointer = 7; // tracks current day
 
-let currentDay = previewMode ? 7 : day; // start from Feb 7 in preview mode
-
-if(!previewMode && (month<2 || (month==2 && day<7))){
-  text.innerHTML="Do you really want to open it? Its not time yet 🥺";
-  buttons.innerHTML=`
-    <button id="yesBtn" class="primary">YES 😈</button>
-    <button class="secondary" onclick="fakeOpen()">NO 🙂</button>
+function showFirstPage(){
+  text.innerHTML = "I have something special for you 😚. Do you want to open it?";
+  buttons.innerHTML = `
+    <button class="primary" id="yesBtn">YES 🥰</button>
+    <button class="secondary" id="noBtn">NO 🥲</button>
   `;
-  const yesBtn=document.getElementById("yesBtn");
-  yesBtn.addEventListener("mouseover",()=>{
-    yesBtn.style.position="absolute";
-    yesBtn.style.top=Math.random()*80+"%";
-    yesBtn.style.left=Math.random()*80+"%";
+
+  document.getElementById("yesBtn").addEventListener("click", ()=>{
+    unlockExplosion();
+    if(previewMode){
+      showEvent(dayPointer);
+    } else {
+      startCountdown(dayPointer);
+    }
   });
-  window.fakeOpen=function(){
-    text.innerHTML="I was just kidding 😚 you can open it";
-    setTimeout(()=>{
-      text.innerHTML="No no… still not right time 😈";
-      startCountdown(currentDay);
-    },2000);
-  }
-} else {
-  startCountdown(currentDay);
+
+  document.getElementById("noBtn").addEventListener("click", ()=>{
+    text.innerHTML = "Haha I was kidding 😏, come on open it!";
+    buttons.innerHTML = `<button class="primary" id="continueBtn">Open 😘</button>`;
+    document.getElementById("continueBtn").addEventListener("click", ()=>{
+      unlockExplosion();
+      if(previewMode){
+        showEvent(dayPointer);
+      } else {
+        startCountdown(dayPointer);
+      }
+    });
+  });
 }
 
-/* ================= COUNTDOWN ================= */
+/* ================= COUNTDOWN FUNCTION ================= */
 function startCountdown(dayToShow){
   buttons.innerHTML="";
   let target = targets[dayToShow];
@@ -192,13 +190,19 @@ function unlockExplosion(){
 
 /* ================= SHOW DAILY EVENT ================= */
 function showEvent(d){
-  d = d || new Date().getDate();
+  if(d>14){
+    text.innerHTML="❤️ All Valentine week surprises done my lady! ❤️";
+    buttons.innerHTML="";
+    timer.innerHTML="";
+    return;
+  }
+  dayPointer = d;
   text.innerHTML = messages[d];
   timer.innerHTML="";
+  buttons.innerHTML="";
 
-  // After 1.5 sec show Continue button in preview mode
   if(previewMode){
-    setTimeout(()=>{showContinue(d)},1500);
+    setTimeout(()=>{showContinue(d+1)},1500);
   } else {
     // Real mode: teasing after 15 sec
     setTimeout(()=>{
@@ -210,7 +214,7 @@ function showEvent(d){
         if(c<=0){
           clearInterval(t);
           text.innerHTML+="<br><br>Its just started my lady 😚 theres more...";
-          buttons.innerHTML=`<button class="primary" onclick="tease(${d})">Do you want to see?</button>`;
+          buttons.innerHTML=`<button class="primary" onclick="tease(${d+1})">Do you want to see?</button>`;
         }
       },1000);
     },15000);
@@ -218,11 +222,11 @@ function showEvent(d){
 }
 
 /* ================= TEASING FLOW ================= */
-function tease(dayNow){
+function tease(nextDay){
   text.innerHTML="Uh oh 😈 still time left my lady... dont get excited.";
   buttons.innerHTML="";
   if(previewMode){
-    setTimeout(()=>{showContinue(dayNow+1)},1000);
+    setTimeout(()=>{showContinue(nextDay)},1000);
   }
 }
 
@@ -231,6 +235,7 @@ function showContinue(nextDay){
   if(nextDay>14){
     text.innerHTML="❤️ All Valentine week surprises done my lady! ❤️";
     buttons.innerHTML="";
+    timer.innerHTML="";
     return;
   }
   buttons.innerHTML=`<button class="primary" onclick="nextWish(${nextDay})">Continue ➡️</button>`;
@@ -239,11 +244,18 @@ function showContinue(nextDay){
 function nextWish(dayToShow){
   buttons.innerHTML="";
   unlockExplosion();
-  showEvent(dayToShow);
+  if(previewMode){
+    showEvent(dayToShow);
+  } else {
+    startCountdown(dayToShow);
+  }
 }
 
-</script>
+/* ================= START ================= */
+showFirstPage();
 
+</script>
 </body>
 </html>
+
 
