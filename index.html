@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>For Jenuu ❤️</title>
+
+<style>
+
+body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#ff9acb,#ff4fa3);
+font-family:sans-serif;
+color:white;
+text-align:center;
+overflow:hidden;
+transition:1s;
+}
+
+.card{
+background:rgba(255,255,255,0.2);
+backdrop-filter:blur(20px);
+padding:40px;
+border-radius:25px;
+max-width:600px;
+box-shadow:0 0 40px rgba(255,20,147,0.6);
+animation:fade 1s;
+}
+
+@keyframes fade{
+from{opacity:0; transform:translateY(20px);}
+to{opacity:1;}
+}
+
+button{
+padding:12px 25px;
+border:none;
+border-radius:25px;
+margin:10px;
+font-size:16px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.primary{background:#ff1493;color:white;}
+.secondary{background:#ffd1dc;color:black;}
+
+.heart{
+position:absolute;
+animation:float 6s linear infinite;
+}
+
+@keyframes float{
+100%{transform:translateY(-120vh);}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2 id="text">Loading...</h2>
+
+<div id="buttons"></div>
+
+<div id="timer"></div>
+
+</div>
+
+<script>
+
+/* ========= PREVIEW MODE ========= */
+/* true = YOU can test anytime */
+/* false = real locked version */
+
+const previewMode = true;
+
+/* ================================= */
+
+const text=document.getElementById("text");
+const buttons=document.getElementById("buttons");
+const timer=document.getElementById("timer");
+
+/* floating hearts animation */
+setInterval(()=>{
+let h=document.createElement("div");
+h.className="heart";
+h.innerHTML="❤️";
+h.style.left=Math.random()*100+"vw";
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),6000);
+},400);
+
+
+/* ================= CURRENT YEAR VALENTINE TARGETS ================= */
+let now = new Date();
+let currentYear = now.getFullYear();
+
+// Valentine week days Feb 7 → Feb 14
+let targets = {
+  7: new Date(`${currentYear}-02-07T00:00:00`),
+  8: new Date(`${currentYear}-02-08T00:00:00`),
+  9: new Date(`${currentYear}-02-09T00:00:00`),
+ 10: new Date(`${currentYear}-02-10T00:00:00`),
+ 11: new Date(`${currentYear}-02-11T00:00:00`),
+ 12: new Date(`${currentYear}-02-12T00:00:00`),
+ 13: new Date(`${currentYear}-02-13T00:00:00`),
+ 14: new Date(`${currentYear}-02-14T00:00:00`)
+};
+
+
+/* ================= PRE-LOCK PAGE ================= */
+const today=new Date();
+const day=today.getDate();
+const month=today.getMonth()+1;
+
+if(!previewMode && (month<2 || (month==2 && day<7))){
+
+text.innerHTML="Do you really want to open it? Its not time yet 🥺";
+
+buttons.innerHTML=`
+<button id="yesBtn" class="primary">YES 😈</button>
+<button class="secondary" onclick="fakeOpen()">NO 🙂</button>
+`;
+
+const yesBtn=document.getElementById("yesBtn");
+
+/* YES button runs away 😈 */
+yesBtn.addEventListener("mouseover",()=>{
+yesBtn.style.position="absolute";
+yesBtn.style.top=Math.random()*80+"%";
+yesBtn.style.left=Math.random()*80+"%";
+});
+
+/* NO button */
+window.fakeOpen=function(){
+text.innerHTML="I was just kidding 😚 you can open it";
+setTimeout(()=>{
+text.innerHTML="No no… still not right time 😈";
+startCountdown();
+},2000);
+}
+
+}
+
+
+/* ================= COUNTDOWN FUNCTION ================= */
+function startCountdown(){
+
+buttons.innerHTML="";
+
+let d = new Date().getDate();
+let target = targets[d] || targets[7]; // fallback to Feb 7
+
+let countdown = setInterval(()=>{
+
+let now=new Date();
+let diff = target - now;
+
+if(diff <= 0){
+clearInterval(countdown);
+unlockExplosion();
+showEvent();
+return;
+}
+
+let days=Math.floor(diff/(1000*60*60*24));
+let hours=Math.floor((diff/(1000*60*60))%24);
+let minutes=Math.floor((diff/(1000*60))%60);
+let seconds=Math.floor((diff/1000)%60);
+
+timer.innerHTML=`⏳ Opens in:<br>
+${days}d ${hours}h ${minutes}m ${seconds}s ❤️`;
+
+},1000);
+
+}
+
+
+/* ================= HEART EXPLOSION ================= */
+function unlockExplosion(){
+for(let i=0;i<40;i++){
+let h=document.createElement("div");
+h.innerHTML="💖";
+h.style.position="absolute";
+h.style.left="50%";
+h.style.top="50%";
+document.body.appendChild(h);
+let x=(Math.random()-0.5)*600;
+let y=(Math.random()-0.5)*600;
+h.animate([{transform:"translate(0,0)"},{transform:`translate(${x}px,${y}px)`}],{duration:1000});
+setTimeout(()=>h.remove(),1000);
+}
+}
+
+
+/* ================= DAILY EVENTS ================= */
+function showEvent(){
+
+let messages={
+7:"🌹 Happy Rose Day Jenuu ❤️ You are my favorite flower.",
+8:"💍 Happy Propose Day ❤️ Will you be mine forever?",
+9:"🍫 Happy Chocolate Day ❤️ You make life sweeter.",
+10:"🧸 Happy Teddy Day ❤️ Sending soft hugs.",
+11:"🤝 Happy Promise Day ❤️ I promise always.",
+12:"🤗 Happy Hug Day ❤️ Feel my hug.",
+13:"😘 Happy Kiss Day ❤️ Sending kisses.",
+14:"❤️ Happy Valentine's Day my lady ❤️"
+};
+
+let d = previewMode ? 7 : new Date().getDate();
+
+text.innerHTML=messages[d] || "Love you ❤️";
+
+/* After 15 sec teasing flow */
+setTimeout(()=>{
+let c=15;
+timer.innerHTML=c+" sec";
+
+let t=setInterval(()=>{
+c--;
+timer.innerHTML=c+" sec";
+
+if(c<=0){
+clearInterval(t);
+text.innerHTML+="<br><br>Its just started my lady 😚 theres more...";
+buttons.innerHTML=`<button class="primary" onclick="tease()">Do you want to see?</button>`;
+}
+
+},1000);
+
+},15000);
+
+}
+
+window.tease=function(){
+text.innerHTML="Uh oh 😈 still time left my lady... dont get excited.";
+buttons.innerHTML="";
+}
+
+
+/* ================= START ================= */
+if(previewMode){
+unlockExplosion();
+showEvent();
+}else if(month==2 && day>=7){
+unlockExplosion();
+showEvent();
+}
+
+</script>
+
+</body>
+</html>
